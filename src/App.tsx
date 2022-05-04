@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import { useState, useEffect } from "react";
 import { fabric } from "fabric";
 const App = () => {
   const [canvas, setCanvas] = useState("");
