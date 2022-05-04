@@ -13,13 +13,9 @@ const App = () => {
       height: 800,
       width: 800,
       backgroundColor: "red",
+      selectable: true,
+      hasControls: true,
     });
-
-  // const canvas = new fabric.Canvas("canvas", {
-  //   width: 800,
-  //   height: 800,
-  //   backgroundColor: "red",
-  // });
 
   let [valHeight, setvalHeight] = useState("");
   let [valWidth, setvalWidth] = useState("");
@@ -44,9 +40,12 @@ const App = () => {
         height: parseInt(valHeight),
         width: parseInt(valWidth),
         fill: "blue",
+        selectable: true,
+        hasControls: true,
       });
       canvi.add(rect);
       canvi.renderAll();
+      console.log(rect);
     }
   };
 
