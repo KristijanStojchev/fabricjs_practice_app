@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { fabric } from "fabric";
 import "./App.css";
+import marker from "../src/marker.png";
+import background from "../src/background.png";
 
 const App = () => {
   const [canvas, setCanvas] = useState("");
@@ -10,29 +12,35 @@ const App = () => {
     setCanvas(initCanvas("canvas"));
   }, []);
 
-  const initCanvas = (id: any) =>
-    new fabric.Canvas(id, {
-      // backgroundColor: "red",
-      // width: fabric.util.parseUnit("100in"),
-      // height: fabric.util.parseUnit("100in"),
+  const initCanvas = (id: any) => {
+    const newCanvas = new fabric.Canvas(id, {
       selectable: true,
       hasControls: true,
     });
 
+    newCanvas.setDimensions(
+      { width: "100%", height: "100%" },
+      { cssOnly: true }
+    );
+    // newCanvas.setHeight(500);
+    // newCanvas.setWidth(800);
+    // newCanvas.renderAll();
+
+    setBackground(background, newCanvas);
+    return newCanvas;
+  };
+
   const setBackground = (url: any, canvas: any) => {
     fabric.Image.fromURL(url, (img: any) => {
+      img.scaleToWidth(canvas.width);
+      img.scaleToHeight(canvas.height);
       canvas.backgroundImage = img;
       canvas.renderAll();
     });
   };
 
-  setBackground(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/A_large_blank_world_map_with_oceans_marked_in_blue.svg/1200px-A_large_blank_world_map_with_oceans_marked_in_blue.svg.png?20190530212301",
-    canvas
-  );
-
-  let [valHeight, setvalHeight] = useState("");
-  let [valWidth, setvalWidth] = useState("");
+  // let [valHeight, setvalHeight] = useState("");
+  // let [valWidth, setvalWidth] = useState("");
   let [valX, setvalX] = useState("");
   let [valY, setvalY] = useState("");
 
@@ -63,19 +71,20 @@ const App = () => {
   //   }
   // };
 
-  const myImg =
-    "https://cdn-icons.flaticon.com/png/512/2776/premium/2776067.png?token=exp=1652083972~hmac=2ecef23ad8668e83abefe142c16cd866";
+  const myImg = marker;
 
   const pinPoint = (e: any, canvas: any) => {
     e.preventDefault();
     fabric.Image.fromURL(myImg, (img: any) => {
-      const _me = img.set({
+      img.scaleToWidth(canvas.width);
+      img.scaleToHeight(canvas.height);
+      const markerIcon = img.set({
         top: parseInt(valX),
         left: parseInt(valY),
-        height: parseInt(valHeight),
-        width: parseInt(valWidth),
+        height: img.height,
+        width: img.width,
       });
-      canvas.add(_me);
+      canvas.add(markerIcon);
     });
   };
 
@@ -93,7 +102,7 @@ const App = () => {
         id="form"
         onSubmit={(e) => pinPoint(e, canvas)}
       >
-        <label htmlFor="height">Height </label>
+        {/* <label htmlFor="height">Height </label>
         <input
           id="height"
           placeholder="Enter the height"
@@ -104,7 +113,7 @@ const App = () => {
           id="width"
           placeholder="Enter the width"
           onChange={(event) => setvalWidth(event.target.value)}
-        />
+        /> */}
         <label htmlFor="y"> Y coordinate </label>
         <input
           id="y"
