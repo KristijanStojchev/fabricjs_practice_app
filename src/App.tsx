@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { fabric } from "fabric";
 import "./App.css";
 import marker from "../src/marker.png";
-import background from "../src/background.png";
+import background from "../src/background1.jpg";
 
 const App = () => {
   const [canvas, setCanvas] = useState("");
@@ -18,13 +18,13 @@ const App = () => {
       hasControls: true,
     });
 
-    newCanvas.setDimensions(
-      { width: "100%", height: "100%" },
-      { cssOnly: true }
-    );
-    // newCanvas.setHeight(500);
-    // newCanvas.setWidth(800);
-    // newCanvas.renderAll();
+    // newCanvas.setDimensions(
+    //   { width: "100%", height: "100%" },
+    //   { cssOnly: true }
+    // );
+    newCanvas.setHeight(1250);
+    newCanvas.setWidth(1600);
+    newCanvas.renderAll();
 
     setBackground(background, newCanvas);
     return newCanvas;
@@ -76,13 +76,12 @@ const App = () => {
   const pinPoint = (e: any, canvas: any) => {
     e.preventDefault();
     fabric.Image.fromURL(myImg, (img: any) => {
-      img.scaleToWidth(canvas.width);
-      img.scaleToHeight(canvas.height);
       const markerIcon = img.set({
         top: parseInt(valX),
         left: parseInt(valY),
         height: img.height,
         width: img.width,
+        // scaleY: -5,
       });
       canvas.add(markerIcon);
     });
@@ -127,7 +126,7 @@ const App = () => {
           onChange={(event) => setvalY(event.target.value)}
         />
         <button className="button" type="submit">
-          Generate Rectangle
+          Submit
         </button>
       </form>
       <div className="full-screen">
