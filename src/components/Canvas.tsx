@@ -22,6 +22,8 @@ export default function Canvas() {
     newCanvas.setWidth(1700);
 
     setBackground(background, newCanvas);
+    zoom(newCanvas);
+    zoomDraging(newCanvas);
 
     return newCanvas;
   };
@@ -35,14 +37,53 @@ export default function Canvas() {
     });
   };
 
-  const myImg = marker;
+  const zoom = (canvas: any) => {
+    canvas.on("mouse:wheel", function (opt: any) {
+      let delta = opt.e.deltaY;
+      let zoom = canvas.getZoom();
+      zoom *= 0.999 ** delta;
+      if (zoom > 20) zoom = 20;
+      if (zoom < 0.01) zoom = 0.01;
+      canvas.setZoom(zoom);
+      opt.e.preventDefault();
+      opt.e.stopPropagation();
+    });
+  };
+
+  const zoomDraging = (canvas: any) => {
+    canvas.on("mouse:down", (opt: any) => {
+      let evt = opt.e;
+      if (evt.altKey === true) {
+        canvas.isDragging = true;
+        canvas.selection = false;
+        canvas.lastPosX = evt.clientX;
+        canvas.lastPosY = evt.clientY;
+      }
+    });
+    canvas.on("mouse:move", (opt: any) => {
+      if (canvas.isDragging) {
+        let e = opt.e;
+        let vpt = canvas.viewportTransform;
+        vpt[4] += e.clientX - canvas.lastPosX;
+        vpt[5] += e.clientY - canvas.lastPosY;
+        canvas.requestRenderAll();
+        canvas.lastPosX = e.clientX;
+        canvas.lastPosY = e.clientY;
+      }
+    });
+    canvas.on("mouse:up", (opt: any) => {
+      canvas.setViewportTransform(canvas.viewportTransform);
+      canvas.isDragging = false;
+      canvas.selection = true;
+    });
+  };
 
   const pinPoint = (canvas: any) => {
     coordinates.map((data) => {
-      fabric.Image.fromURL(myImg, (img: any) => {
+      fabric.Image.fromURL(marker, (img: any) => {
         const markerIcon = img.set({
-          top: data.latitude,
-          left: data.longitude,
+          top: data.alpha2 === "AQ" ? data.latitude + 97 : data.latitude,
+          left: data.alpha2 === "AQ" ? data.longitude + 481 : data.longitude,
           height: img.height,
           width: img.width,
         });
