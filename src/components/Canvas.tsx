@@ -4,9 +4,27 @@ import background from "../assets/background.png";
 import marker from "../assets/marker.png";
 import { coordinates } from "../assets/data";
 import styles from "../components/Canvas.module.scss";
+import Modal from "react-modal";
 
 export default function Canvas() {
   const [canvas, setCanvas] = useState("");
+  const [modalName, setModalName] = useState("");
+  const [modalshortName, setModalShortName] = useState("");
+  const [isModalOpened, setisModalOpened] = useState(false);
+
+  const countryInfo = (code: any) => {
+    let names = "";
+    let shortName = "";
+
+    coordinates.map((data) => {
+      if (data.alpha2 === code) {
+        names = data.country;
+        shortName = data.alpha2;
+      }
+
+      return setModalName(names), setModalShortName(shortName);
+    });
+  };
 
   useEffect(() => {
     setCanvas(initCanvas("canvas"));
@@ -18,8 +36,8 @@ export default function Canvas() {
       hasControls: true,
     });
 
-    newCanvas.setHeight(680);
-    newCanvas.setWidth(1700);
+    newCanvas.setHeight(window.innerHeight);
+    newCanvas.setWidth(window.innerWidth);
 
     setBackground(background, newCanvas);
     zoom(newCanvas);
@@ -30,8 +48,8 @@ export default function Canvas() {
 
   const setBackground = (url: any, canvas: any) => {
     fabric.Image.fromURL(url, (img: any) => {
-      img.scaleToWidth(canvas.width);
-      img.scaleToHeight(canvas.height);
+      img.scaleX = 1;
+      img.scaleY = 1;
       canvas.backgroundImage = img;
       canvas.renderAll();
     });
@@ -82,13 +100,20 @@ export default function Canvas() {
     coordinates.map((data) => {
       fabric.Image.fromURL(marker, (img: any) => {
         const markerIcon = img.set({
-          top: data.alpha2 === "AQ" ? data.latitude + 97 : data.latitude,
-          left: data.alpha2 === "AQ" ? data.longitude + 481 : data.longitude,
+          top: data.latitude * 20,
+          left: data.longitude * 20,
           height: img.height,
           width: img.width,
+          scaleX: 1,
+          scaleY: 1,
+          id: data.alpha2,
         });
+
         canvas.add(markerIcon);
-        console.log(markerIcon);
+        markerIcon.on("mousedown", function (e: any) {
+          setisModalOpened(true);
+          countryInfo(data.alpha2);
+        });
       });
     });
   };
@@ -96,8 +121,21 @@ export default function Canvas() {
   pinPoint(canvas);
 
   return (
-    <div className={styles.fullScreen}>
-      <canvas id="canvas" />
+    <div>
+      <Modal
+        isOpen={isModalOpened}
+        onRequestClose={() => setisModalOpened(false)}
+        ariaHideApp={false}
+      >
+        <div>
+          <p>Name of country: {modalName} </p>
+          <p>Short name of the country: {modalshortName} </p>
+        </div>
+        <button onClick={() => setisModalOpened(false)}>Close</button>
+      </Modal>
+      <div className={styles.fullScreen}>
+        <canvas id="canvas" />
+      </div>
     </div>
   );
 }
